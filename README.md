@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Depression / Stress Prediction using XGBoost
 
 This project builds an end-to-end machine learning pipeline to predict **depression / stress risk** using a real-world mental health dataset (`Stress.csv`).
@@ -74,3 +75,7 @@ It includes:
 ├── model.pkl          # created after running train.py
 ├── scaler.pkl         # created after running train.py
 └── README.md
+=======
+# depression-risk-prediction
+Machine learning model using XGBoost to predict depression risk with preprocessing, feature engineering, and interactive CLI predictor.
+>>>>>>> cdaa3a715258ddddcaba7f986ee3938d48d0ded3
