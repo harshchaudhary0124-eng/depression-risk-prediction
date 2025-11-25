@@ -125,9 +125,9 @@ def main():
 
     # ---------- 4. DISPLAY RESULT ----------
     if pred_label == 1:
-        print(f"\n🧠 Prediction: DEPRESSION (probability = {pred_prob:.2f})")
+        print(f"\n Prediction: DEPRESSION (probability = {pred_prob:.2f})")
     else:
-        print(f"\n😊 Prediction: NO DEPRESSION (probability = {pred_prob:.2f})")
+        print(f"\n Prediction: NO DEPRESSION (probability = {pred_prob:.2f})")
 
 
 if __name__ == "__main__":
