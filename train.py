@@ -13,13 +13,13 @@ from preprocessing import load_and_preprocess
 
 
 def main():
-    # ---------- 1. LOAD & PREPROCESS ----------
+    # LOADING AND PREPROCESSING BY CALLING preprocessing.py
     features, labels, metadata = load_and_preprocess("Stress.csv")
 
     # All feature names
     feature_cols = features.columns.tolist()
 
-    # Numeric columns to scale (exactly as in your notebook)
+    # Numeric columns to scale
     numeric_cols = [
         "Age",
         "Academic Pressure",
@@ -34,7 +34,7 @@ def main():
         "City_freq",
     ]
 
-    # ---------- 2. TRAIN / TEST SPLIT ----------
+    # SPLITING INTO TRAINING AND TESTING SET
     X_train, X_test, y_train, y_test = train_test_split(
         features,
         labels,
@@ -43,12 +43,12 @@ def main():
         stratify=labels,
     )
 
-    # ---------- 3. SCALE NUMERIC COLUMNS ----------
+    # SCALING NUMERIC COLUMNS
     scaler = StandardScaler()
     X_train.loc[:, numeric_cols] = scaler.fit_transform(X_train[numeric_cols])
     X_test.loc[:, numeric_cols] = scaler.transform(X_test[numeric_cols])
 
-    # ---------- 4. TRAIN XGBOOST ----------
+    # TRAINING USING XGBOOST
     neg = (y_train == 0).sum()
     pos = (y_train == 1).sum()
     scale_pos_weight = neg / pos
@@ -68,7 +68,7 @@ def main():
 
     model.fit(X_train, y_train)
 
-    # ---------- 5. EVALUATE ----------
+    # EVALUATING THE ACCURACY
     y_pred = model.predict(X_test)
     acc = accuracy_score(y_test, y_pred) * 100
 
@@ -76,13 +76,13 @@ def main():
     print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
     print("\nClassification Report:\n", classification_report(y_test, y_pred))
 
-    # Feature importance (top 20)
+    # Feature importance to tell which value affects the most
     fi = pd.Series(model.feature_importances_, index=X_train.columns).sort_values(
         ascending=False
     )
     print("\nTop 20 Features:\n", fi.head(20))
 
-    # ---------- 6. SAVE ARTIFACTS ----------
+    # SAVING ARTIFACTS
     # model.pkl: just the XGBoost model
     joblib.dump(model, "model.pkl")
 
