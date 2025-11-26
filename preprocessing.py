@@ -4,25 +4,26 @@ import pandas as pd
 import numpy as np
 from sklearn.impute import SimpleImputer
 
-
-def load_and_preprocess(csv_path: str = "Stress.csv"):
+"""
+    Here we are loading the Stress.csv dataset , cleaning it , encoding categorical variables , creating City_freq and then returning:
+          features_df: which is the processed feature DataFrame
+          labels: target Series (Depression)
+          metadata: dictionary with helper objects
     """
-    Load the Stress.csv dataset, clean it, encode categorical variables,
-    create City_freq, and return:
-        - features_df: processed feature DataFrame (unscaled)
-        - labels: target Series (Depression)
-        - metadata: dictionary with helper objects (e.g., city_freq_map)
-    """
+    
+def load_and_preprocess(csv_path: str = "Stress.csv"):   
 
-    # ---------- 1. LOAD RAW DATA ----------
+    # LOADING RAW DATA
+    
     df = pd.read_csv(csv_path)
 
-    # ---------- 2. HANDLE MISSING VALUES ----------
-    # Financial Stress: impute median
+    # HANDLING MISSING VALUES 
+    
+    # We see that Financial Stress has 3 missing or Null values , therefore using impute median
     imputer = SimpleImputer(strategy="median")
     df[["Financial Stress"]] = imputer.fit_transform(df[["Financial Stress"]])
 
-    # ---------- 3. TRANSFORM SLEEP DURATION & DIETARY HABITS ----------
+    # TRANSFORMING SLEEP DURATION & DIETARY HABITS
     # Sleep Duration
     df["Sleep Duration"] = df["Sleep Duration"].replace(
         {
@@ -40,19 +41,19 @@ def load_and_preprocess(csv_path: str = "Stress.csv"):
     )
     df["Dietary Habits"] = df["Dietary Habits"].replace("Others", np.nan)
 
-    # Replace remaining NaNs in these columns with approximate means
+    # Replacing remaining NaNs in these columns with approximate means
     df["Sleep Duration"] = df["Sleep Duration"].replace(np.nan, 2.3)
     df["Dietary Habits"] = df["Dietary Habits"].replace(np.nan, 1.9)
 
-    # Rename to Sleep Quality / Diet Quality
+    # Renaming to Sleep Quality and Diet Quality respectively
     df.rename(columns={"Sleep Duration": "Sleep Quality"}, inplace=True)
     df.rename(columns={"Dietary Habits": "Diet Quality"}, inplace=True)
 
-    # ---------- 4. COPY & CLEAN COLUMN NAMES ----------
+    # COPYING AND CLEANING COLUMN NAMES
     df_final = df.copy()
     df_final.columns = df_final.columns.str.strip()
 
-    # ---------- 5. ENCODE BINARY CATEGORICAL FEATURES ----------
+    # ENCODING THE BINARY CATEGORICAL FEATURES
     # Gender
     if "Gender" in df_final.columns:
         df_final["Gender"] = df_final["Gender"].map({"Male": 1, "Female": 0})
@@ -67,7 +68,7 @@ def load_and_preprocess(csv_path: str = "Stress.csv"):
     if fam_col in df_final.columns:
         df_final[fam_col] = df_final[fam_col].map({"Yes": 1, "No": 0})
 
-    # ---------- 6. PROFESSION → STUDENT / WORKING ----------
+    # Since Profession column contains mostly StudentS therfore dividing PROFESSION with either STUDENT OR WORKING
     if "Profession" in df_final.columns:
         df_final["Profession_clean"] = df_final["Profession"].apply(
             lambda x: "Student" if x == "Student" else "Working"
@@ -80,13 +81,13 @@ def load_and_preprocess(csv_path: str = "Stress.csv"):
         ).astype(int)
         df_final.drop(["Profession", "Profession_clean"], axis=1, inplace=True)
 
-    # ---------- 7. DEGREE → ONE-HOT ENCODING ----------
+    # PROCESSING DEGREE WITH ONE-HOT ENCODING
     if "Degree" in df_final.columns:
         df_final = pd.get_dummies(df_final, columns=["Degree"], drop_first=True)
 
-    # ---------- 8. CITY CLEANING + FREQUENCY ENCODING ----------
+    # CLEANING CITY COLUMN WITH FREQUENCY ENCODING
     if "City" in df_final.columns:
-        # Fix obvious typos
+        # FixING typos
         df_final["City"] = df_final["City"].replace(
             {
                 "Nalyan": "Kalyan",
@@ -117,10 +118,10 @@ def load_and_preprocess(csv_path: str = "Stress.csv"):
         ]
         df_final.loc[df_final["City"].isin(invalid_cities), "City"] = np.nan
 
-        # Build frequency map from CLEANED City
+        # Building frequency map from CLEANED City
         city_freq_map = df_final["City"].value_counts()
 
-        # Map to frequency
+        # Mapping to frequency
         df_final["City_freq"] = df_final["City"].map(city_freq_map)
 
         # Drop original City
@@ -129,19 +130,19 @@ def load_and_preprocess(csv_path: str = "Stress.csv"):
         city_freq_map = pd.Series(dtype="int64")
         df_final["City_freq"] = 0.0
 
-    # ---------- 9. CONVERT BOOL TO INT ----------
+    # CONVERTING BOOLEAN VALUES TO INT TYPE
     bool_cols = df_final.select_dtypes(include=["bool"]).columns
     df_final[bool_cols] = df_final[bool_cols].astype(int)
 
-    # ---------- 10. DROP ID COLUMN IF PRESENT ----------
+    # DROPING ID COLUMN
     if "id" in df_final.columns:
         df_final = df_final.drop("id", axis=1)
 
-    # ---------- 11. IMPUTE City_freq MISSING WITH MEDIAN ----------
+    # IMPUTING City_freq MISSING WITH MEDIAN
     imputer_city = SimpleImputer(strategy="median")
     df_final[["City_freq"]] = imputer_city.fit_transform(df_final[["City_freq"]])
 
-    # ---------- 12. SPLIT FEATURES & LABELS ----------
+    # SPLITING FEATURES & LABELS
     labels = df_final["Depression"].copy()
     features = df_final.drop("Depression", axis=1).copy()
 
