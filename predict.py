@@ -4,7 +4,7 @@ import joblib
 import numpy as np
 import pandas as pd
 
-""" This function is used to ask repeatedly until user provides a valid float """
+# Here we have added a function that is used to ask repeatedly until user provides a valid float 
 def ask_float(prompt: str) -> float:
     
     while True:
