@@ -231,12 +231,12 @@ def main():
             if pred_label == 1:
                 st.error(
                     f"Based on the data you entered, the model predicts that you are **likely DEPRESSED**.\n\n"
-                    f"**Stress / depression probability:** `{pred_prob:.2f}`"
+                    f"**Stress probability:** `{pred_prob:.2f}`"
                 )
             else:
                 st.success(
                     f"Based on the data you entered, the model predicts that you are **NOT DEPRESSED**.\n\n"
-                    f"**Stress / depression probability:** `{pred_prob:.2f}`"
+                    f"**Stress probability:** `{pred_prob:.2f}`"
                 )
 
             with st.expander("See the processed feature row (debug / explainability)"):
