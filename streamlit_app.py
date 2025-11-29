@@ -20,7 +20,6 @@ def load_artifacts():
     numeric_cols = scaler_artifacts["numeric_cols"]
     city_freq_map = scaler_artifacts["city_freq_map"]
 
-    # Extract degree options from feature columns (columns like "Degree_B.Tech")
     degree_cols = [c for c in feature_cols if c.startswith("Degree_")]
     degree_options = [c.replace("Degree_", "") for c in degree_cols]
 
@@ -34,15 +33,11 @@ def build_feature_row_streamlit(
     scaler,
     inputs,
 ):
-    """
-    Build a 1-row DataFrame from Streamlit inputs and apply scaling
-    to the numeric columns using the trained scaler.
-    """
 
-    # Create 1xN row filled with zeros for all features
+    # Creating 1xN row filled with zeros for all features
     row = pd.DataFrame(0, index=[0], columns=feature_cols)
 
-    # ---- Fill numeric features ----
+    # Fill numeric features
     row.loc[0, "Age"] = inputs["age"]
     row.loc[0, "Academic Pressure"] = inputs["acad_press"]
     row.loc[0, "Work Pressure"] = inputs["work_press"]
@@ -67,7 +62,7 @@ def build_feature_row_streamlit(
 
         row.loc[0, "City_freq"] = city_freq_value
 
-    # ---- Fill binary / categorical encodings ----
+    # Fill binary / categorical encodings
 
     # Gender
     if "Gender" in row.columns:
@@ -104,7 +99,7 @@ def build_feature_row_streamlit(
             "The model will still make a prediction, but it may be slightly less accurate."
         )
 
-    # ---- Scale numeric columns using trained scaler ----
+    # Scaling numeric columns using trained scaler
     row[numeric_cols] = scaler.transform(row[numeric_cols])
 
     return row
@@ -113,12 +108,12 @@ def build_feature_row_streamlit(
 def main():
     st.set_page_config(page_title="Depression & Stress Tracker", page_icon="🧠", layout="centered")
 
-    st.title("🧠 Depression & Stress Tracker")
+    st.title("Depression & Stress Tracker")
     st.write(
         """
-        This app uses an XGBoost model trained on your **Stress.csv** dataset  
+        This app uses an XGBoost model trained on a dataset of 27,902 observations recorded all over India   
         to estimate whether a person is likely to be **depressed** or **not depressed**  
-        based on lifestyle, academic/work, and mental health factors.
+        based on lifestyle, academic/work, city(pollution index) and mental health factors.
         """
     )
 
