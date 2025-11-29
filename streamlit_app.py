@@ -106,7 +106,7 @@ def build_feature_row_streamlit(
 
 
 def main():
-    st.set_page_config(page_title="Depression & Stress Tracker", page_icon="🧠", layout="centered")
+    st.set_page_config(page_title="Depression & Stress Tracker", layout="centered")
 
     st.title("Depression & Stress Tracker")
     st.write(
